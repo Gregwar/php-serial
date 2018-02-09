@@ -26,15 +26,15 @@ We then echo back the result received, and present the form again for additional
 
 function microtime_float()
 {
-	list($usec, $sec) = explode(" ", microtime());
-	return ((float)$usec + (float)$sec);
+    list($usec, $sec) = explode(" ", microtime());
+    return ((float)$usec + (float)$sec);
 }
 
 $the_input  = $_POST['the_input'];
 
 if ($the_input == '') {
-	echo "<div id='newrequestbox'>";
-	echo "<form id='FormName' name='FormName' action='example_VS421CPNTA.php' method='post'>
+    echo "<div id='newrequestbox'>";
+    echo "<form id='FormName' name='FormName' action='example_VS421CPNTA.php' method='post'>
 			<table width=500>
 				<tr>
 					<td>Switch to input? :</td>
@@ -43,53 +43,52 @@ if ($the_input == '') {
 				</tr>
 			</table>
 		</form>";
-	echo "</div>";
+    echo "</div>";
 } else {
+    include "php_serial.class.php";
 
-include "php_serial.class.php";
+    // Let's start the class
+    $serial = new phpSerial;
 
-// Let's start the class
-$serial = new phpSerial;
+    // First we must specify the device. This works on both linux and windows (if
+    // your linux serial device is /dev/ttyS0 for COM1, etc)
+    // $serial->deviceSet("COM1");
+    $serial->deviceSet("/dev/cu.usbserial-FTDY7ID6");
 
-// First we must specify the device. This works on both linux and windows (if
-// your linux serial device is /dev/ttyS0 for COM1, etc)
-// $serial->deviceSet("COM1");
-$serial->deviceSet("/dev/cu.usbserial-FTDY7ID6");
+    // We can change the baud rate, parity, length, stop bits, flow control
+    $serial->confBaudRate(2400);
+    $serial->confParity("none");
+    $serial->confCharacterLength(8);
+    $serial->confStopBits(1);
+    $serial->confFlowControl("none");
 
-// We can change the baud rate, parity, length, stop bits, flow control
-$serial->confBaudRate(2400);
-$serial->confParity("none");
-$serial->confCharacterLength(8);
-$serial->confStopBits(1);
-$serial->confFlowControl("none");
+    // Then we need to open it
+    $serial->deviceOpen();
 
-// Then we need to open it
-$serial->deviceOpen();
+    // To write into
+    $serial->sendMessage("I".$the_input);
 
-// To write into
-$serial->sendMessage("I".$the_input);
+    // Or to read from
+    $read = '';
+    $theResult = '';
+    $start = microtime_float();
 
-// Or to read from
-$read = '';
-$theResult = '';
-$start = microtime_float();
+    while (($read == '') && (microtime_float() <= $start + 0.5)) {
+        $read = $serial->readPort();
+        if ($read != '') {
+            $theResult .= $read;
+            $read = '';
+        }
+    }
 
-while ( ($read == '') && (microtime_float() <= $start + 0.5) ) {
-	$read = $serial->readPort();
-	if ($read != '') {
-		$theResult .= $read;
-		$read = '';
-	}
-}
+    // If you want to change the configuration, the device must be closed
+    $serial->deviceClose();
 
-// If you want to change the configuration, the device must be closed
-$serial->deviceClose();
+    // etc...
 
-// etc...
+    echo "Read data: ".$theResult."<br>";
 
-echo "Read data: ".$theResult."<br>";
-
-echo "<form id='FormName' name='FormName' action='example_VS421CPNTA.php' method='post'>
+    echo "<form id='FormName' name='FormName' action='example_VS421CPNTA.php' method='post'>
 		<table width=500>
 
 			<tr>
@@ -100,5 +99,3 @@ echo "<form id='FormName' name='FormName' action='example_VS421CPNTA.php' method
 		</table>
 	</form>";
 }
-
-?>
