@@ -23,6 +23,7 @@ We then echo back the result received, and present the form again for additional
 
 */
 
+require_once __DIR__."/../PhpSerial.php";
 
 function microtime_float()
 {
@@ -45,10 +46,9 @@ if ($the_input == '') {
 		</form>";
     echo "</div>";
 } else {
-    include "php_serial.class.php";
 
     // Let's start the class
-    $serial = new phpSerial;
+    $serial = new \PhpSerial\PhpSerial();
 
     // First we must specify the device. This works on both linux and windows (if
     // your linux serial device is /dev/ttyS0 for COM1, etc)

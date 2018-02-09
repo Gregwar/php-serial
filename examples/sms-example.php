@@ -1,8 +1,9 @@
 <?php
-include "php_serial.class.php";
+
+require_once __DIR__."/../PhpSerial.php";
 
 // Let's start the class
-$serial = new phpSerial;
+$serial = new \PhpSerial\PhpSerial();
 
 // First we must specify the device. This works on both linux and windows (if
 // your linux serial device is /dev/ttyS0 for COM1, etc)

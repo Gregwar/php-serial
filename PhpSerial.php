@@ -40,7 +40,7 @@ class PhpSerial
     /**
      * Constructor. Perform some checks about the OS and setserial
      *
-     * @return PhpSerial
+     * PhpSerial constructor.
      */
     public function __construct()
     {

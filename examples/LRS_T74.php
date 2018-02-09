@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LRS_T74
  * Specifically developed for the LRS T74C232 interface
